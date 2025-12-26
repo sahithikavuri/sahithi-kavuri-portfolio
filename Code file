@@ -1,0 +1,53 @@
+Code
+// Smart Bathroom Safety System
+// Arduino Uno
+
+// Pin Definitions
+const int irPin = 2;         // IR Sensor digital pin
+const int trigPin = 3;       // Ultrasonic Trig
+const int echoPin = 4;       // Ultrasonic Echo
+const int buzzerPin = 5;     // Buzzer
+
+// Variables
+long duration;
+int distance;
+
+void setup() {
+  pinMode(irPin, INPUT);         // IR Sensor input
+  pinMode(trigPin, OUTPUT);      // Ultrasonic Trig output
+  pinMode(echoPin, INPUT);       // Ultrasonic Echo input
+  pinMode(buzzerPin, OUTPUT);    // Buzzer output
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Read IR sensor
+  int irState = digitalRead(irPin);
+
+  // Read Ultrasonic sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2; // Calculate distance in cm
+
+  Serial.print("IR State: ");
+  Serial.print(irState);
+  Serial.print(" | Distance: ");
+  Serial.println(distance);
+
+  // Condition Check
+  // If IR detects motion AND Ultrasonic distance < 10cm (example: fallen person)
+  if (irState == LOW || distance < 10) {  
+    // Trigger Buzzer
+    digitalWrite(buzzerPin, HIGH);
+  } else {
+    // Stop Buzzer
+    digitalWrite(buzzerPin, LOW);
+  }
+
+  delay(500); // Delay for stability
+}
